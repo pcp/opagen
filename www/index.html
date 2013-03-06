@@ -1,0 +1,97 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>opagen.com --------------------------------------Online Passwort Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link href="http://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css" />
+  <link href="css/bootstrap.min.css" rel="stylesheet" media="screen" />
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" language="JavaScript"></script>
+  <script src="js/bootstrap.min.js" language="JavaScript"></script>
+  <script src="js/whirlpool.js" language="JavaScript"></script>
+  <script src="js/passgen.js" language="JavaScript"></script>
+
+<script>
+var mouse_x = 0,
+    mouse_y = 0;
+
+jQuery.cachedScript = function(url, options) {
+  options = $.extend(options || {}, {
+    dataType: "script",
+    cache: true,
+    url: url
+  });
+  return jQuery.ajax(options);
+};
+
+//alert(navigator.plugins[Math.floor(Math.random()*navigator.plugins.length)].name);
+function generate(){
+  var seed = navigator.userAgent+' '+Date.now()+' '+window.innerWidth+' '+mouse_x+' '+mouse_y+' '+document.referrer+' '+window.navigator.oscpu+' '+window.navigator.plugins[Math.floor(Math.random()*navigator.plugins.length)].name;
+  var language = $('.language option:selected').val();
+  $.cachedScript('js/wordlist_'+language+'.js')
+    .done(function(script, textStatus){
+      passgen = new Passgen(seed);//.generate(words);
+      password = passgen.generate(wordlist);
+      $('#password').text(password.join(' '));
+  });
+/*
+  $.getScript('js/wordlist_'+language+'.js', function(data, textStatus, jqxhr) {
+    passgen = new Passgen(seed);//.generate(words);
+    password = passgen.generate(wordlist);
+    $('#password').text(password.join(' '));
+  });
+*/
+}
+
+$(document).ready(function(){
+  $(document).mousemove(function(e){
+    mouse_x = e.pageX;
+    mouse_y = e.pageY;
+  });
+  $('.language').change(function() {
+    generate();
+  });
+  language = $('.language option:selected').val();
+  generate();
+});
+</script>
+</head>
+<body>
+<a href="https://github.com/pcp"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
+<div id="wrap">
+  <div class="container"> 
+    <div class="page-header"> 
+      <h1>Online Passwort Generator</h1> 
+    </div> 
+    <p class="lead">Passwort Generator inspiriert von einem Comicstrip von <a href="https://xkcd.com/">xkcd</a>.&nbsp;Die Idee beruht auf der Annahme, dass die durchschnittliche L&auml;nge an Zeichen von mehreren zuf&auml;llig aneinandergereihten W&ouml;rtern ausreicht um ein Passwort f&uuml;r den gew&ouml;hnlichen Gebrauch annehmbar sicher zu machen.</p>
+    <p>Link zu dem Orginal <a href="https://xkcd.com/936/">xkcd</a> Comicstrip.</p> 
+  </div>
+  <div class="container">
+    <!-- Jumbotron --> 
+    <div class="jumbotron">
+      <div class="cont"> 
+        <p id="password" class="lead">schwimmen laufen Haus Hund</p> 
+        <a class="btn btn-large btn-success" href="#" onclick="generate()">generieren</a>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <form>
+      <select class="language">
+        <option value="de" selected="selected">deutsch</option>
+        <option value="en">english</option>
+        <option value="fr">fran&ccedil;e</option>
+        <option value="nl">Nederlands</option>
+      </select>
+    </form>
+  </div>
+  <div id="push">&nbsp;</div>
+</div>
+<div id="footer">
+  <div class="container">
+    <p class="muted credit">Copyright &copy; 2013 <a href="http://pcp.feierabendcrafting.de">Patric Pendelin</a>, All Rights Reserved</p>
+  </div>
+</div>
+</body>
+</html>
