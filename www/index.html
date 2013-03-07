@@ -2,60 +2,19 @@
 <html>
 <head>
   <title>Online Passwort Generator</title>
+  <meta charset="utf-8">  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <!-- let´s load some fancy fonds --> 
   <link href="http://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css" />
+  
+  <!-- the style -->
   <link href="css/bootstrap.min.css" rel="stylesheet" media="screen" />
-  <link rel="stylesheet" type="text/css" href="css/style.css" />
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" language="JavaScript"></script>
-  <script src="js/bootstrap.min.js" language="JavaScript"></script>
-  <script src="js/whirlpool.js" language="JavaScript"></script>
-  <script src="js/passgen.js" language="JavaScript"></script>
+  <link href="css/style.css" rel="stylesheet" type="text/css" />
 
-<script>
-var mouse_x = 0,
-    mouse_y = 0;
-
-jQuery.cachedScript = function(url, options) {
-  options = $.extend(options || {}, {
-    dataType: "script",
-    cache: true,
-    url: url
-  });
-  return jQuery.ajax(options);
-};
-
-//alert(navigator.plugins[Math.floor(Math.random()*navigator.plugins.length)].name);
-function generate(){
-  var seed = navigator.userAgent+' '+Date.now()+' '+window.innerWidth+' '+mouse_x+' '+mouse_y+' '+document.referrer+' '+window.navigator.oscpu+' '+window.navigator.plugins[Math.floor(Math.random()*navigator.plugins.length)].name;
-  var language = $('.language option:selected').val();
-  $.cachedScript('js/wordlist_'+language+'.js')
-    .done(function(script, textStatus){
-      passgen = new Passgen(seed);//.generate(words);
-      password = passgen.generate(wordlist);
-      $('#password').text(password.join(' '));
-  });
-/*
-  $.getScript('js/wordlist_'+language+'.js', function(data, textStatus, jqxhr) {
-    passgen = new Passgen(seed);//.generate(words);
-    password = passgen.generate(wordlist);
-    $('#password').text(password.join(' '));
-  });
-*/
-}
-
-$(document).ready(function(){
-  $(document).mousemove(function(e){
-    mouse_x = e.pageX;
-    mouse_y = e.pageY;
-  });
-  $('.language').change(function() {
-    generate();
-  });
-  language = $('.language option:selected').val();
-  generate();
-});
-</script>
+  <!-- the HTML5 workaround for IE6-8 support of HTML5 elements -->
+  <!--[if lt IE 9]>
+    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
 </head>
 <body>
 <a href="https://github.com/pcp/opagen"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
@@ -68,15 +27,16 @@ $(document).ready(function(){
     <p>Link zu dem Orginal <a href="https://xkcd.com/936/">xkcd</a> Comicstrip.</p> 
   </div>
   <div class="container">
-    <!-- Jumbotron --> 
+    <!-- jumbotron --> 
     <div class="jumbotron">
       <div class="cont"> 
-        <p id="password" class="lead">schwimmen laufen Haus Hund</p> 
+        <p id="password" class="lead">&nbsp;<span></span></p>
         <a class="btn btn-large btn-success" href="#" onclick="generate()">generieren</a>
       </div>
     </div>
   </div>
   <div class="container">
+    <div style="font-size:12px;padding:0 0.1em 0.2em 0;">verfügbar auf:</div>
     <form>
       <select class="language">
         <option value="de" selected="selected">deutsch</option>
@@ -93,5 +53,55 @@ $(document).ready(function(){
     <p class="muted credit">Copyright &copy; 2013 <a href="http://pcp.feierabendcrafting.de">Patric Pendelin</a>, All Rights Reserved</p>
   </div>
 </div>
+<!-- the javascript for faster rendering at the bottom of the page-->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" language="JavaScript"></script>
+<script src="js/bootstrap.min.js" language="JavaScript"></script>
+<script src="js/whirlpool.js" language="JavaScript"></script>
+<script src="js/passgen.js" language="JavaScript"></script>
+<script>
+var mouse_x = 0,
+    mouse_y = 0;
+    wordlists = {'language':[]};
+
+function generate(){
+  $('#password').text('');
+  var seed = navigator.userAgent+' '+Date.now()+' '+window.innerWidth+' '+mouse_x+' '+mouse_y+' '+document.referrer+' '+window.navigator.oscpu+' '+window.navigator.plugins[Math.floor(Math.random()*navigator.plugins.length)].name;
+  var language = $('.language option:selected').val();
+  var passgen = new Passgen(seed);//.generate(wordlists);
+  var password = passgen.generate(wordlists.language[language]);
+  $('#password').text(password.join(' '));
+}
+
+$(document).ready(function(){
+  var language = $('.language option:selected').val();
+
+  //$.getJSON('data/wordlist.'+language+'.json?'+new Date().getTime(), function(data) {
+  $.getJSON('data/wordlist.'+language+'.json', function(data) {
+    console.log('load first lang '+language+' '+data[language][0]);
+    wordlists.language[language] = data[language];
+    generate();
+    $('.language option:not(:selected)')
+      .each(function(){
+        var lang = $(this).val();
+        $.getJSON('data/wordlist.'+lang+'.json?'+new Date().getTime(), function(data) {
+          console.log('load lang '+lang+' '+data[lang][0]);
+          wordlists.language[lang] = data[lang];
+        });
+      });
+  }).error(function(jqXHR, textStatus, errorThrown) {
+    console.log("error " + textStatus);
+    console.log("incoming Text " + jqXHR.responseText);
+  });
+
+  $(document).mousemove(function(e){
+    mouse_x = e.pageX;
+    mouse_y = e.pageY;
+  });
+
+  $('.language').change(function() {
+    generate();
+  });
+});
+</script>
 </body>
 </html>

@@ -50,6 +50,10 @@ body {
   }
 }
 
+.language {
+  margin-left:0.2em;
+}
+
 #push,
 #footer {
   height: 40px;

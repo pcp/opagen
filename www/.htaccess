@@ -1,5 +1,5 @@
-ErrorDocument 404 /www/error-404.html
-ErrorDocument 401 /www/error-401.html
+ErrorDocument 404 /error-404.html
+ErrorDocument 401 /error-401.html
 
 # BEGIN Better WP Security
 # Begin HackRepair.com Blacklist
@@ -142,3 +142,21 @@ RewriteCond %{HTTP_USER_AGENT} ^Zeus\.*Webster [NC,OR]
 RewriteCond %{HTTP_USER_AGENT} ZyBorg [NC]
 RewriteRule ^.* - [F,L]
 # Abuse bot blocking rule end
+# End HackRepair.com Blacklist
+# END Better WP Security
+
+<files .bash_logout>
+        Order deny,allow
+        deny from all
+</files>
+
+<files .bashrc>
+        Order deny,allow
+        deny from all
+</files>
+
+<files .profile>
+        Order deny,allow
+        deny from all
+</files>
+

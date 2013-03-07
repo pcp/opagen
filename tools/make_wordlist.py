@@ -17,6 +17,7 @@ __status__ = "Prototype"
 import sys
 import getopt
 import os
+import re
 
 class NumberList(list):
     pass    #much code deleted
@@ -117,12 +118,25 @@ Options:
                 print 'found %s' % file_name
                 raw_files.append(file_name)
 
+    json_str = '{"version":"1.0",'
+    json_str += '"language":{'
     for raw_file in raw_files:
+        try:
+            print raw_file
+            m = re.search('\.(.*)\.', raw_file)
+            language = m.group(1)
+        except IndexError as r:
+            print r
+            print 'no language detected in filename %s continue with next raw file' % raw_file
+            continue
+        
+        print 'working on current language %s' % language
         js_file = '%s.js' % raw_file.replace('.raw', '')
         path = os.path.join(js_path, js_file)
-        dest = open(path, "w")
         wordlist = 'wordlist=['
         path = os.path.join(raw_path, raw_file)
+        json_str += '"%s":[' % language
+        json_lang_str = '{"%s":[' % language
         print 'read rawfile %s' % path
         with open(path) as f:
             for row in f:
@@ -130,15 +144,38 @@ Options:
                 if verbose:
                     print row.rstrip()
                 wordlist += '"%s",' % row.rstrip()
+                json_str += '"%s",' % row.rstrip()
+                json_lang_str += '"%s",' % row.rstrip()
         wordlist = wordlist.rstrip(',')
         wordlist += '];'
+        json_str = json_str.rstrip(',')
+        json_str += '],'
+        json_lang_str = json_lang_str.rstrip(',')
+        json_lang_str += ']}'
+
         if verbose:
-            print 'finish printing wordlist...'
-            print wordlist
+            print 'finish printing json for %s...' % language
+            print json_lang_str
         path = os.path.join(js_path, js_file)
         print 'write to jsfile %s' % path
+        dest = open(path, "w")
         dest.write(wordlist)
         dest.close()
+
+        path = os.path.join(js_path, 'wordlist.%s.json' % language)
+        print 'write to json file %s' % path
+        dest = open(path, "w")
+        dest.write(json_lang_str)
+        dest.close()
+
+
+    json_str = json_str.rstrip(',')
+    json_str += '}}'
+    path = os.path.join(js_path, 'wordlist.json')
+    print 'write to json file %s' % path
+    dest = open(path, "w")
+    dest.write(json_str)
+    dest.close()
     print 'work done'
 
 if __name__ == "__main__":

@@ -1,13 +1,8 @@
-/*!
-* passgen.js by @blog_man
-* Copyright 2013 Patric Pendelin
-* http://www.apache.org/licenses/LICENSE-2.0.txt
-*
-* =Usage
-* passwort[] = Passgen(seed).generate();
-* passwort[] = Passgen.generate();
-*
-*/
+// @license = public domain
+// =Usage
+// passwort[] = Passgen(seed).generate();
+// passwort[] = Passgen.generate();
+//
 ;(function(){
 
 var Hash = Whirlpool,
